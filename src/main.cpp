@@ -29,9 +29,10 @@ ASSUMPTIONS:
 
 // ==================== CONNECTION CONFIGURATION ==================== //
 
-// Port/Starboard config pins
-#define DIR_JUMP_PIN_O PIN_PA2
-#define DIR_JUMP_PIN_I PIN_PA3
+// Port/Starboard config pins, MUST BE ON GPIO PORT A
+#define DIR_JUMP_PIN_O_BITMASK  PIN2_bm
+#define DIR_JUMP_PIN_I_BITMASK  PIN3_bm
+#define DIR_JUMP_PIN_I_CONTROL  PORTA_PIN3CTRL  // Ensure correct port and pin
 
 // Neopixel connection
 #define NEOPIXEL_PIN PIN_PA1
@@ -109,16 +110,11 @@ bool bea_state = false;
 bool col_state = false;
 
 void setup() {
-  // // Checking if starboard jumper is present
-  // // Using two digital pins simply as a convenience since they are located
-  // // next to eachother on the pin headers. 
-  // pinMode(DIR_JUMP_PIN_O, OUTPUT);
-  // pinMode(DIR_JUMP_PIN_I, INPUT_PULLUP);
-
+  // Checking if starboard jumper is present
   // Doing some register level manipulation of GPIO to avoid costly Arduino calls
-  PORTA_DIRSET = PIN2_bm;      // Setting PA2 to output mode
-  PORTA_OUTCLR = PIN2_bm;      // Setting PA2 to output LOW
-  PORTA_DIRCLR = PIN3_bm;      // Setting PA3 to input mode
+  PORTA_DIRSET = DIR_JUMP_PIN_O_BITMASK;      // Setting PA2 to output mode
+  PORTA_OUTCLR = DIR_JUMP_PIN_O_BITMASK;      // Setting PA2 to output LOW
+  PORTA_DIRCLR = DIR_JUMP_PIN_I_BITMASK;      // Setting PA3 to input mode
   PORTA_PIN3CTRL = PORT_PULLUPEN_bm;  // Enabling pullup on PA3
 
   // If `DIR_JUMP_PIN_I` is connected to gnd, we're on starboard, otherwise port
