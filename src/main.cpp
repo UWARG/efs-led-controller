@@ -37,6 +37,9 @@ ASSUMPTIONS:
 #define NEOPIXEL_PIN PIN_PA1
 #define NEOPIXEL_CNT 6
 
+// Neopixel transmission
+#define NEOPIXEL_PACKET_LEN 3
+
 // Indices (0-based) of the different light types from the start of the NeoPixel chain
 #define NAV_LIGHT_A_IDX 1   // Index of the 1st navigation light 
 #define NAV_LIGHT_B_IDX 2   // Index of the 2nd navigation light
@@ -90,7 +93,8 @@ enum Side { PORT, STBD };
 // Since we are doing some strange stuff to bypass calls to malloc and free,
 // do NOT call the destructor on this before the microcontroller is shutting down,
 // otherwise memory corruption will occur.
-uint8_t pixels[NEOPIXEL_CNT] = { };  // Pointer to raw neopixel LED data
+// Size of this array is dependent on the transmission format of the connected LEDS
+uint8_t pixels[NEOPIXEL_CNT * NEOPIXEL_PACKET_LEN] = { };  // Pointer to raw neopixel LED data
 SlimAdafruit_NeoPixel flight_lights(NEOPIXEL_CNT, pixels, NEOPIXEL_PIN, NEO_GRB | NEO_KHZ800);
 
 // To store which side of the craft we are on
