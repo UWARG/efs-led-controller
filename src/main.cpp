@@ -71,7 +71,7 @@ ASSUMPTIONS:
 #define BEA_LIGHT_INCR_HI 12  // Duration beacon lights will be on each strobe (in increments)
 #define BEA_LIGHT_INCR_LO 12  // Duration beacon lights will be off each strobe (in increments)
 
-// Color of beacon lights (0x00rrggbb)
+// Color of anti-collision lights (0x00rrggbb)
 #define COL_LIGHT_COLOR       0x00FFFFFF
 
 // Color of off lights -- should always be 0x00000000
