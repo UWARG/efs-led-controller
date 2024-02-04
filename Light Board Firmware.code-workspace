@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "Light Board Firmware",
+			"path": "."
+		}
+	],
+	"settings": {
+		"editor.rulers": [
+			80,
+		]
+	}
+}
