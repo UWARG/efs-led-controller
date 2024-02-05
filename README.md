@@ -1,18 +1,19 @@
 # UWARG Lighting Board Firmware
 
 This repository containst a small program written to control the navigation,
-beacon, and anti-collision lights. It is written to fit into the limited flash
-space available on an ATtiny202 and as such features a pared down version of the
-Adafruit NeoPixel library.
+beacon, and anti-collision lights of UWARG's LED lighting boards. It is written
+with flash memory limitations in mind, as it is intended to run on an ATtiny202
+microcontroller with only 2KB of flash memory. Because of this, this program
+features a pared down version of the Adafruit NeoPixel library.
 
 Physically, the lighting of the drone is provided by four lighting control
 boards, one on each motor. Each of these boards hosts an ATtiny202 which will 
 run this program.
 
-To enable different colored navigation lights based on the side of the drone the
-lighting controller board is place on, a jumper can be placed between pins PA2
-and PA3 (by default). A present jumper causes the program to display starboard-
-side lighting, otherwise it will display port-side lighting.
+To enable different lighting for port and starboard lighting boards, the program
+detects the presence of a jumper between pins PA2 and PA3 (by default). If a jumper
+is present, this program will display starboard-side lighting, otherwise it will display
+port-side lighting.
 
 # Changing Lighting
 To change the color, strobe frequncy, and duty cycle of the lighting, edit the
