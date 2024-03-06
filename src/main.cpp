@@ -60,6 +60,15 @@ ASSUMPTIONS:
 // The total strobe times of the beacon lights and anti-collision lights
 // should be coprime to maximize the time before they synchronize.
 
+// To control the beacon and anti-collision blinking without using too much 
+// flash memory, a very simple control scheme is used. First, an interval of
+// time (INCREMENT_DUR) is chosen to which the lights will synchronize. Each
+// blinking light has a duration (in increments) for which it should stay on and
+// stay off. Each time `INCREMENT_DUR` ms have passed, the duration each light
+// has been in its current state (on/off) is incremented. When the light has 
+// been on/off for enough increments, its state is toggled and the its duration
+// in counter state is reset.
+
 // Light cycle duration configuration
 #define INCREMENT_DUR 100     // Duration of a lighting increment in ms
 
@@ -129,45 +138,49 @@ void setup() {
 }
 
 void loop() {
+  // If we've been in the current state as long as we should be
   if (bea_dur_in_state >= bea_state ? BEA_LIGHT_INCR_HI : BEA_LIGHT_INCR_LO) {
+    // Switching to other state
     bea_state = !bea_state;
     
+    // Changing color of pixel based on new state
     if (!bea_state) {
-      col_state = true;
       flight_lights.setPixelColor(BEA_LIGHT_A_IDX, BEA_LIGHT_COLOR);
       flight_lights.setPixelColor(BEA_LIGHT_B_IDX, BEA_LIGHT_COLOR);
     }
     else {
-      col_state = false;
       flight_lights.setPixelColor(BEA_LIGHT_A_IDX, OFF_COLOR);
       flight_lights.setPixelColor(BEA_LIGHT_B_IDX, OFF_COLOR);
     }
     flight_lights.show();
 
+    // Reseting duration in current state
     bea_dur_in_state = 0;
   }
 
+  // If we've been in the current state as long as we should be
   if (col_dur_in_state >= col_state ? COL_LIGHT_INCR_HI : COL_LIGHT_INCR_LO) {
+    // Switching to other state
     col_state = !col_state;
     
-    // Updating lights
+    // Changing color of pixel based on new state
     if (!col_state) {
-      col_state = true;
       flight_lights.setPixelColor(COL_LIGHT_A_IDX, COL_LIGHT_COLOR);
       flight_lights.setPixelColor(COL_LIGHT_B_IDX, COL_LIGHT_COLOR);
     } else {
-      col_state = false;
       flight_lights.setPixelColor(COL_LIGHT_A_IDX, OFF_COLOR);
       flight_lights.setPixelColor(COL_LIGHT_B_IDX, OFF_COLOR);
     }
     flight_lights.show();
 
+    // Reseting duration in current state
     col_dur_in_state = 0;
   }
 
   // Waiting for our increment to complete
   delay(INCREMENT_DUR);
 
+  // Incrementing time we've spent in the current state for blinking lights
   bea_dur_in_state++;
   col_dur_in_state++;
 }
