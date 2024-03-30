@@ -106,7 +106,7 @@ enum Side { PORT, STBD };
 // otherwise memory corruption will occur.
 // Size of this array is dependent on the transmission format of the connected LEDS
 byte pixels[NEOPIXEL_CNT * NEOPIXEL_BYTES_PER_PIXEL] = { };  // Pointer to raw neopixel LED data
-tinyNeoPixel flight_lights(NEOPIXEL_CNT, NEOPIXEL_PIN, NEO_GRB | NEO_KHZ800, pixels);
+tinyNeoPixel flight_lights(NEOPIXEL_CNT, NEOPIXEL_PIN, NEO_GRB, pixels);
 // SlimAdafruit_NeoPixel flight_lights(NEOPIXEL_CNT, pixels, NEOPIXEL_PIN, NEO_GRB | NEO_KHZ800);
 
 // To store which side of the craft we are on
@@ -134,21 +134,14 @@ void setup() {
   // Assigning colors based on board side
   uint32_t nav_color = board_side == Side::PORT ? NAV_LIGHT_P_COLOR : NAV_LIGHT_S_COLOR;
 
+  pinMode(NEOPIXEL_PIN, OUTPUT);
+
   flight_lights.setPixelColor(NAV_LIGHT_A_IDX, nav_color);
   flight_lights.setPixelColor(NAV_LIGHT_B_IDX, nav_color);
   flight_lights.show();
 }
 
 void loop() {
-  
-  flight_lights.setPixelColor(0, 0x00FFFFFF);
-  flight_lights.setPixelColor(1, 0x00FFFFFF);
-  flight_lights.setPixelColor(2, 0x00FFFFFF);
-  flight_lights.setPixelColor(3, 0x00FFFFFF);
-  flight_lights.setPixelColor(4, 0x00FFFFFF);
-  flight_lights.setPixelColor(5, 0x00FFFFFF);
-  flight_lights.show();
-  
   // If we've been in the current state as long as we should be
   if (bea_dur_in_state >= (bea_state ? BEA_LIGHT_INCR_HI : BEA_LIGHT_INCR_LO)) {
     // Switching to other state
