@@ -25,7 +25,7 @@ ASSUMPTIONS:
 */
 
 #include <Arduino.h>
-#include <SlimAdafruit_NeoPixel.h>
+#include <tinyNeoPixel_Static.h>
 
 // ==================== CONNECTION CONFIGURATION ==================== //
 
@@ -39,7 +39,8 @@ ASSUMPTIONS:
 #define NEOPIXEL_CNT 6
 
 // Neopixel transmission
-#define NEOPIXEL_PACKET_LEN 3
+// How many data bytes need to be sent per neopixel (most likely 3)
+#define NEOPIXEL_BYTES_PER_PIXEL 3
 
 // Indices (0-based) of the different light types from the start of the NeoPixel chain
 #define NAV_LIGHT_A_IDX 1   // Index of the 1st navigation light 
@@ -104,8 +105,9 @@ enum Side { PORT, STBD };
 // do NOT call the destructor on this before the microcontroller is shutting down,
 // otherwise memory corruption will occur.
 // Size of this array is dependent on the transmission format of the connected LEDS
-uint8_t pixels[NEOPIXEL_CNT * NEOPIXEL_PACKET_LEN] = { };  // Pointer to raw neopixel LED data
-SlimAdafruit_NeoPixel flight_lights(NEOPIXEL_CNT, pixels, NEOPIXEL_PIN, NEO_GRB | NEO_KHZ800);
+byte pixels[NEOPIXEL_CNT * NEOPIXEL_BYTES_PER_PIXEL] = { };  // Pointer to raw neopixel LED data
+tinyNeoPixel flight_lights(NEOPIXEL_CNT, NEOPIXEL_PIN, NEO_GRB | NEO_KHZ800, pixels);
+// SlimAdafruit_NeoPixel flight_lights(NEOPIXEL_CNT, pixels, NEOPIXEL_PIN, NEO_GRB | NEO_KHZ800);
 
 // To store which side of the craft we are on
 Side board_side;
@@ -138,8 +140,17 @@ void setup() {
 }
 
 void loop() {
+  
+  flight_lights.setPixelColor(0, 0x00FFFFFF);
+  flight_lights.setPixelColor(1, 0x00FFFFFF);
+  flight_lights.setPixelColor(2, 0x00FFFFFF);
+  flight_lights.setPixelColor(3, 0x00FFFFFF);
+  flight_lights.setPixelColor(4, 0x00FFFFFF);
+  flight_lights.setPixelColor(5, 0x00FFFFFF);
+  flight_lights.show();
+  
   // If we've been in the current state as long as we should be
-  if (bea_dur_in_state >= bea_state ? BEA_LIGHT_INCR_HI : BEA_LIGHT_INCR_LO) {
+  if (bea_dur_in_state >= (bea_state ? BEA_LIGHT_INCR_HI : BEA_LIGHT_INCR_LO)) {
     // Switching to other state
     bea_state = !bea_state;
     
@@ -159,7 +170,7 @@ void loop() {
   }
 
   // If we've been in the current state as long as we should be
-  if (col_dur_in_state >= col_state ? COL_LIGHT_INCR_HI : COL_LIGHT_INCR_LO) {
+  if (col_dur_in_state >= (col_state ? COL_LIGHT_INCR_HI : COL_LIGHT_INCR_LO)) {
     // Switching to other state
     col_state = !col_state;
     
