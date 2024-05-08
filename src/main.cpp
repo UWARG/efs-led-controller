@@ -25,7 +25,7 @@ ASSUMPTIONS:
 */
 
 #include <Arduino.h>
-#include <SlimAdafruit_NeoPixel.h>
+#include <tinyNeoPixel_Static.h>
 
 // ==================== CONNECTION CONFIGURATION ==================== //
 
@@ -39,7 +39,8 @@ ASSUMPTIONS:
 #define NEOPIXEL_CNT 6
 
 // Neopixel transmission
-#define NEOPIXEL_PACKET_LEN 3
+// How many data bytes need to be sent per neopixel (most likely 3)
+#define NEOPIXEL_BYTES_PER_PIXEL 3
 
 // Indices (0-based) of the different light types from the start of the NeoPixel chain
 #define NAV_LIGHT_A_IDX 1   // Index of the 1st navigation light 
@@ -59,6 +60,15 @@ ASSUMPTIONS:
 // ==================== LIGHTING CONFIGURATION ==================== //
 // The total strobe times of the beacon lights and anti-collision lights
 // should be coprime to maximize the time before they synchronize.
+
+// To control the beacon and anti-collision blinking without using too much 
+// flash memory, a very simple control scheme is used. First, an interval of
+// time (INCREMENT_DUR) is chosen to which the lights will synchronize. Each
+// blinking light has a duration (in increments) for which it should stay on and
+// stay off. Each time `INCREMENT_DUR` ms have passed, the duration each light
+// has been in its current state (on/off) is incremented. When the light has 
+// been on/off for enough increments, its state is toggled and the its duration
+// in counter state is reset.
 
 // Light cycle duration configuration
 #define INCREMENT_DUR 100     // Duration of a lighting increment in ms
@@ -95,8 +105,9 @@ enum Side { PORT, STBD };
 // do NOT call the destructor on this before the microcontroller is shutting down,
 // otherwise memory corruption will occur.
 // Size of this array is dependent on the transmission format of the connected LEDS
-uint8_t pixels[NEOPIXEL_CNT * NEOPIXEL_PACKET_LEN] = { };  // Pointer to raw neopixel LED data
-SlimAdafruit_NeoPixel flight_lights(NEOPIXEL_CNT, pixels, NEOPIXEL_PIN, NEO_GRB | NEO_KHZ800);
+byte pixels[NEOPIXEL_CNT * NEOPIXEL_BYTES_PER_PIXEL] = { };  // Pointer to raw neopixel LED data
+tinyNeoPixel flight_lights(NEOPIXEL_CNT, NEOPIXEL_PIN, NEO_GRB, pixels);
+// SlimAdafruit_NeoPixel flight_lights(NEOPIXEL_CNT, pixels, NEOPIXEL_PIN, NEO_GRB | NEO_KHZ800);
 
 // To store which side of the craft we are on
 Side board_side;
@@ -123,51 +134,57 @@ void setup() {
   // Assigning colors based on board side
   uint32_t nav_color = board_side == Side::PORT ? NAV_LIGHT_P_COLOR : NAV_LIGHT_S_COLOR;
 
+  pinMode(NEOPIXEL_PIN, OUTPUT);
+
   flight_lights.setPixelColor(NAV_LIGHT_A_IDX, nav_color);
   flight_lights.setPixelColor(NAV_LIGHT_B_IDX, nav_color);
   flight_lights.show();
 }
 
 void loop() {
-  if (bea_dur_in_state >= bea_state ? BEA_LIGHT_INCR_HI : BEA_LIGHT_INCR_LO) {
+  // If we've been in the current state as long as we should be
+  if (bea_dur_in_state >= (bea_state ? BEA_LIGHT_INCR_HI : BEA_LIGHT_INCR_LO)) {
+    // Switching to other state
     bea_state = !bea_state;
     
+    // Changing color of pixel based on new state
     if (!bea_state) {
-      col_state = true;
       flight_lights.setPixelColor(BEA_LIGHT_A_IDX, BEA_LIGHT_COLOR);
       flight_lights.setPixelColor(BEA_LIGHT_B_IDX, BEA_LIGHT_COLOR);
     }
     else {
-      col_state = false;
       flight_lights.setPixelColor(BEA_LIGHT_A_IDX, OFF_COLOR);
       flight_lights.setPixelColor(BEA_LIGHT_B_IDX, OFF_COLOR);
     }
     flight_lights.show();
 
+    // Reseting duration in current state
     bea_dur_in_state = 0;
   }
 
-  if (col_dur_in_state >= col_state ? COL_LIGHT_INCR_HI : COL_LIGHT_INCR_LO) {
+  // If we've been in the current state as long as we should be
+  if (col_dur_in_state >= (col_state ? COL_LIGHT_INCR_HI : COL_LIGHT_INCR_LO)) {
+    // Switching to other state
     col_state = !col_state;
     
-    // Updating lights
+    // Changing color of pixel based on new state
     if (!col_state) {
-      col_state = true;
       flight_lights.setPixelColor(COL_LIGHT_A_IDX, COL_LIGHT_COLOR);
       flight_lights.setPixelColor(COL_LIGHT_B_IDX, COL_LIGHT_COLOR);
     } else {
-      col_state = false;
       flight_lights.setPixelColor(COL_LIGHT_A_IDX, OFF_COLOR);
       flight_lights.setPixelColor(COL_LIGHT_B_IDX, OFF_COLOR);
     }
     flight_lights.show();
 
+    // Reseting duration in current state
     col_dur_in_state = 0;
   }
 
   // Waiting for our increment to complete
   delay(INCREMENT_DUR);
 
+  // Incrementing time we've spent in the current state for blinking lights
   bea_dur_in_state++;
   col_dur_in_state++;
 }
