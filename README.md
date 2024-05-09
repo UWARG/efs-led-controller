@@ -88,7 +88,7 @@ The pinouts for each header are shown below, make sure you are using the correct
 ![image](https://github.com/UWARG/efs-led-controller/assets/12762677/c9f7ea50-dd3f-492e-ad0f-02290f2324ef)
 ![image](https://github.com/UWARG/efs-led-controller/assets/12762677/91c9ffbf-502b-45aa-ac4c-b58adfdc9351)
 
-The 100 ohm resistor between RST and GND on the Arduino is present to override the Arduino's behavior of resetting when a USB serial connection is made, which would otherwise prevent the jtag2updi sketch from working properly. Note, this wiring must be completed AFTER flashing the jtag2updi sketch onto the Arduino, as the 100 ohm resistor between RST and GND on the Arduino interferes with programming.
+The 100 ohm resistor between RST and +5V on the Arduino is present to override the Arduino's behavior of resetting when a USB serial connection is made, which would otherwise prevent the jtag2updi sketch from working properly. Note, this wiring must be completed AFTER flashing the jtag2updi sketch onto the Arduino, as the 100 ohm resistor between RST and GND on the Arduino interferes with programming.
 
 After double checking the wiring and plugging in the Arduino, you can proceed to flashing the lighting board with PlatformIO.
 
