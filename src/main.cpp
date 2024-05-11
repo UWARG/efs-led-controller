@@ -146,6 +146,11 @@ void loop() {
   if (bea_dur_in_state >= (bea_state ? BEA_LIGHT_INCR_HI : BEA_LIGHT_INCR_LO)) {
     // Switching to other state
     bea_state = !bea_state;
+
+    // Special case when beacon is should be in next state for zero increments
+    // must immediately switch back to prior state
+    if (0 == bea_state ? BEA_LIGHT_INCR_HI : BEA_LIGHT_INCR_LO)
+      bea_state = !bea_state;
     
     // Changing color of pixel based on new state
     if (!bea_state) {
@@ -167,6 +172,11 @@ void loop() {
     // Switching to other state
     col_state = !col_state;
     
+    // Special case when beacon is should be in next state for zero increments
+    // must immediately switch back to prior state
+    if (0 == col_state ? COL_LIGHT_INCR_HI : COL_LIGHT_INCR_LO)
+      col_state = !col_state;
+
     // Changing color of pixel based on new state
     if (!col_state) {
       flight_lights.setPixelColor(COL_LIGHT_A_IDX, COL_LIGHT_COLOR);
