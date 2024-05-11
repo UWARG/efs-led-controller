@@ -74,22 +74,22 @@ ASSUMPTIONS:
 #define INCREMENT_DUR 100     // Duration of a lighting increment in ms
 
 // Color of port side nav lights (0x00rrggbb)
-#define NAV_LIGHT_P_COLOR       0x00FF0000
+#define NAV_LIGHT_P_COLOR 0x00FF0000
 // Color of starboard side nav lights (0x00rrggbb)
-#define NAV_LIGHT_S_COLOR       0x0000FF00
+#define NAV_LIGHT_S_COLOR 0x0000FF00
 
 // Color of beacon lights (0x00rrggbb)
-#define BEA_LIGHT_COLOR         0x00FF0000
+#define BEA_LIGHT_COLOR   0x00FF0000
 
 // Beacon strobe timings
 #define BEA_LIGHT_INCR_HI 12  // Duration beacon lights will be on each strobe (in increments)
 #define BEA_LIGHT_INCR_LO 12  // Duration beacon lights will be off each strobe (in increments)
 
 // Color of anti-collision lights (0x00rrggbb)
-#define COL_LIGHT_COLOR       0x00FFFFFF
+#define COL_LIGHT_COLOR   0x00FFFFFF
 
 // Color of off lights -- should always be 0x00000000
-#define OFF_COLOR             0x00000000
+#define OFF_COLOR         0x00000000
 
 // Anti-collision strobe timings
 #define COL_LIGHT_INCR_HI 10  // Duration anti-collision lights will be on each strobe (in increments)
